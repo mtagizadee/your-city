@@ -9,8 +9,8 @@ import (
 func main() {
   config.LoadConfig()
 
-  server := config.GetServerConfig()
+  serverConfig := config.GetServerConfig()
 
   router := gin.Default()
-  router.Run(fmt.Sprintf("%v:%v",server.Host,server.Port))
+  router.Run(fmt.Sprintf("%v:%v",serverConfig.Host,serverConfig.Port))
 }
