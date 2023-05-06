@@ -1,5 +1,10 @@
+# environment files
 .env
 .env.development
 .env.production
 
+# additional files
+.DS_Store
+
+# markdows
 TODO.md
