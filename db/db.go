@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	"your-city/packages/config"
-	"your-city/packages/users/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,11 +18,6 @@ func Connect() {
   } else { fmt.Println("Connected to the database...") }
 
   database = dataBase
-}
-
-func Migrate() {
-  database.AutoMigrate(&models.User{})
-  fmt.Println("Migrated the models...")
 }
 
 func GetDB() *gorm.DB {
