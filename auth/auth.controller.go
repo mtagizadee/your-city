@@ -14,27 +14,37 @@ type createUserDto struct {
   Password string `json:"password" binding:"required"`
 }
 
+type LoginUserDto struct {
+  Email string `json:"email" binding:"required,email"`
+  Password string `json:"password" binding:"required"`
+}
+
 type AuthController struct {}
 
 var service authService
 
-func (controller *AuthController) Signup(c *gin.Context) {
+func (controller *AuthController) signup(c *gin.Context) {
 	dto, err := utils.ValidateBody[createUserDto](c)
-  if err != nil {
-    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})    
-    return
-  }
+  if utils.SendError(err, c) { return }
 
   user, err := service.Signup(dto)
-  if err != nil {
-    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-    return
-  }
+  if utils.SendError(err, c) { return }
 
   c.IndentedJSON(http.StatusCreated, user)
 }
 
+func (controller *AuthController) login(c *gin.Context) {
+  dto, err := utils.ValidateBody[LoginUserDto](c)
+  if utils.SendError(err, c) { return }
+
+  user, err := service.Ligin(dto)
+  if utils.SendError(err, c) { return }
+
+  c.IndentedJSON(http.StatusOK, user)
+}
+
 func (controller* AuthController) AssignRoutes(router *gin.Engine) {
 	auth := router.Group("/auth")
-	auth.POST("/signup", controller.Signup)
+	auth.POST("/signup", controller.signup)
+  auth.POST("/login", controller.login)
 }

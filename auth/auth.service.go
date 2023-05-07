@@ -26,3 +26,20 @@ func (service *authService) Signup(dto *createUserDto) (*users.User, error) {
 
   return &user, nil
 }
+
+func (service *authService) Ligin(dto *LoginUserDto) (*users.User, error) {
+	usersService := users.GetUsersService()
+
+	// verify the email
+	user, err := usersService.GetByEmail(dto.Email)
+	if err != nil { 
+		return nil, err
+	}
+
+	hash := sha256.Sum256([]byte(dto.Password)) // hash password to verify it
+	if user.Password != fmt.Sprintf("%x", hash) {
+		return nil, fmt.Errorf("wrong password")
+	}
+
+	return user, nil
+}

@@ -24,3 +24,19 @@ func (service *usersService) GetById(id int) (*User, error) {
 
   return &user, nil
 }
+
+func (service *usersService) GetByEmail(email string) (*User, error) {
+  var user User
+  
+  db := db.GetDB()
+  if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+    return nil, err
+  }
+
+  return &user, nil
+
+}
+
+func GetUsersService() *usersService {
+  return service
+}
