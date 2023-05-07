@@ -2,6 +2,7 @@ package auth
 
 import (
 	"net/http"
+	"your-city/packages/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,15 +19,16 @@ type AuthController struct {}
 var service authService
 
 func (controller *AuthController) Signup(c *gin.Context) {
-	var dto createUserDto
-  if err := c.ShouldBindJSON(&dto); err != nil {
-    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	dto, err := utils.ValidateBody[createUserDto](c)
+  if err != nil {
+    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})    
     return
   }
 
-  user, err := service.Signup(&dto)
+  user, err := service.Signup(dto)
   if err != nil {
     c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
   }
 
   c.IndentedJSON(http.StatusCreated, user)

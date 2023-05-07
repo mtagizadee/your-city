@@ -24,4 +24,3 @@ func (service *usersService) GetById(id int) (*User, error) {
 
   return &user, nil
 }
-
