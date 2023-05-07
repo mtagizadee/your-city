@@ -27,7 +27,7 @@ func (controller *AuthController) signup(c *gin.Context) {
 	dto, err := utils.ValidateBody[createUserDto](c)
   if utils.SendError(err, c) { return }
 
-  user, err := service.Signup(dto)
+  user, err := service.signup(dto)
   if utils.SendError(err, c) { return }
 
   c.IndentedJSON(http.StatusCreated, user)
@@ -37,9 +37,10 @@ func (controller *AuthController) login(c *gin.Context) {
   dto, err := utils.ValidateBody[LoginUserDto](c)
   if utils.SendError(err, c) { return }
 
-  user, err := service.Ligin(dto)
+  user, token, err := service.login(dto)
   if utils.SendError(err, c) { return }
 
+  c.Header("Authorization", token)
   c.IndentedJSON(http.StatusOK, user)
 }
 

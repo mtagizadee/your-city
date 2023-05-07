@@ -1,8 +1,9 @@
 package config
 
 import (
-  "os"
-  "github.com/joho/godotenv"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func LoadConfig() {
@@ -13,4 +14,7 @@ func LoadConfig() {
 
   // load database config
   loadDatabase(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"))
+
+  // load jwt config
+  loadJwt(os.Getenv("JWT_SECRET"))
 }
