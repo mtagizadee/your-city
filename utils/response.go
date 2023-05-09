@@ -1,14 +1,14 @@
 package utils
 
 import (
-	"net/http"
+	"your-city/packages/common"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SendError(err error, c *gin.Context) bool {
+func SendError(err *common.ErrorType, c *gin.Context) bool {
 	if err != nil {
-    c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+    c.JSON(err.Status, gin.H{"error": err.Message})
     return true
   }
 

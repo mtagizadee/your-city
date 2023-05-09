@@ -3,17 +3,20 @@ package auth
 import (
 	"crypto/sha256"
 	"fmt"
+	"net/http"
 	"time"
+	"your-city/packages/common"
 	"your-city/packages/config"
 	"your-city/packages/db"
 	"your-city/packages/users"
+	"your-city/packages/utils"
 
 	"github.com/golang-jwt/jwt"
 )
 
 type authService struct {}
 
-func (service *authService) signup(dto *createUserDto) (*users.User, error) {
+func (service *authService) signup(dto *createUserDto) (*users.User, *common.ErrorType) {
   db := db.GetDB()
   
   hash := sha256.Sum256([]byte(dto.Password)) // hash the password
@@ -25,13 +28,17 @@ func (service *authService) signup(dto *createUserDto) (*users.User, error) {
 	}
 
   if err := db.Create(&user).Error; err != nil {
-    return nil, err
+    if utils.IsUniqueKeyError(err) { // for some reason gorm.ErrDuplicatedKey does not work here
+			return nil, &common.ErrorType{Status: http.StatusConflict, Message: "user already exists"}
+		}
+		
+		return nil, utils.DefaultError(err)
   }
 
   return &user, nil
 }
 
-func (service *authService) login(dto *LoginUserDto) (*users.User, string, error) {
+func (service *authService) login(dto *LoginUserDto) (*users.User, string, *common.ErrorType) {
 	usersService := users.GetUsersService()
 
 	// verify the email
@@ -42,7 +49,7 @@ func (service *authService) login(dto *LoginUserDto) (*users.User, string, error
 
 	hash := sha256.Sum256([]byte(dto.Password)) // hash password to verify it
 	if user.Password != fmt.Sprintf("%x", hash) {
-		return nil, "", fmt.Errorf("wrong password")
+		return nil, "", &common.ErrorType{Status: http.StatusForbidden, Message: "wrong password"}
 	}
 
 	token, err := generateJWT(user)
@@ -53,7 +60,7 @@ func (service *authService) login(dto *LoginUserDto) (*users.User, string, error
 	return user, token, nil
 }
 
-func generateJWT(user *users.User) (string, error) {
+func generateJWT(user *users.User) (string, *common.ErrorType) {
 	jwtConfig := config.GetJwtConfig()
 	token := jwt.New(jwt.SigningMethodHS256)
 
@@ -63,7 +70,7 @@ func generateJWT(user *users.User) (string, error) {
 
 	sToken, err := token.SignedString([]byte(jwtConfig.Secret))
 	if err != nil {
-		return "", err
+		return "", utils.DefaultError(err)
 	}
 
 	return sToken, nil
