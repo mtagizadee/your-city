@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"your-city/packages/auth"
 	"your-city/packages/config"
+	"your-city/packages/countries"
 	"your-city/packages/db"
 	"your-city/packages/migration"
 	"your-city/packages/users"
@@ -28,6 +29,10 @@ func main() {
   // users routes
   usersController := new(users.UserController)
   usersController.AssignRoutes(router)
+
+  // countries routes
+  countriesController := new(countries.CountriesController)
+  countriesController.AssignRoutes(router)
 
   router.Run(fmt.Sprintf("%v:%v",serverConfig.Host,serverConfig.Port))
 }

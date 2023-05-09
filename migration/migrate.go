@@ -2,11 +2,15 @@ package migration
 
 import (
 	"fmt"
+	"your-city/packages/countries"
 	"your-city/packages/db"
 	"your-city/packages/users"
 )
 
 func Migrate() {
-	db.GetDB().AutoMigrate(&users.User{})
+	db := db.GetDB()
+	db.AutoMigrate(&users.User{})
+	db.AutoMigrate(&countries.Country{})
+	
 	fmt.Println("Migrated the database...")
 }
